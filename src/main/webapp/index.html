@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Список дел</title>
+</head>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+    let itemsList = null
+    $(document).ready(() => {
+        loadData();
+
+        document.getElementById('checkBox').addEventListener('change', function () {
+            if (this.checked) {
+                fillTable(true)
+            } else {
+                fillTable(false)
+            }
+        })
+    })
+
+    function loadData() {
+        $.ajax({
+            type: 'GET',
+            url: 'item.do',
+            dataType: 'json'
+        }).done(function (data) {
+            itemsList = data;
+            fillTable(document.getElementById('checkBox').checked)
+        })
+    }
+
+    function fillTable(includeDone) {
+        let output = ''
+        let iconDone = '<i class="fa fa-check"></i>';
+        let iconNotDone = '<i class="fa fa-close"></i>';
+        let i = 0;
+        for (; i < itemsList.length; i++) {
+            if (itemsList[i].done === true) {
+                break;
+            }
+            output +=
+                '<tr>' +
+                '<th>' + iconNotDone + '</th>' +
+                '<th>' +
+                `<a href = "update.do?id=${itemsList[i].id}">` +
+                '<i class="fa fa-window-close" style="color: red"></i>' +
+                '</a>' +
+                itemsList[i].description + '</th>' +
+                '<th>' + itemsList[i].created + '</th>' +
+                '</tr>';
+        }
+        if (includeDone === true) {
+            for (; i < itemsList.length; i++) {
+                output +=
+                    '<tr>' +
+                    '<th>' + iconDone + '</th>' +
+                    '<th>' + itemsList[i].description + '</th>' +
+                    '<th>' + itemsList[i].created + '</th>' +
+                    '</tr>';
+            }
+        }
+        document.getElementById('bodyTable').innerHTML = output;
+    }
+
+    function addNewItem() {
+        let description = document.getElementById('description').value
+        if (description === '') {
+            alert('Нужно заполнить описание')
+            return false
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: 'item.do',
+                data: {'description': description},
+                dataType: 'text'
+            }).done(function (data) {
+                alert(data)
+                loadData()
+            })
+            return true
+        }
+    }
+
+</script>
+<body>
+<div class="container pt-3">
+
+    <div class="card" style="width: 100%">
+        <div class="card-header">
+            Добавить к списку дел:
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="form-group">
+                    <label for="description">Описание</label>
+                    <textarea class="form-control" id="description" rows="3"></textarea>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="addNewItem()">Добавить</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div class="container pt-4">
+    <h4>
+        Cписок дел:
+    </h4>
+
+    <div>
+        <input type="checkbox" id="checkBox">
+        <label class="form-check-label" for="checkBox">Включить выполненные</label>
+    </div>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th style="width: 10%;">Статус</th>
+            <th style="width: 70%;">Описание</th>
+            <th style="width: 20%;">Дата создания</th>
+        </tr>
+        </thead>
+        <tbody id="bodyTable">
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
