@@ -45,12 +45,11 @@ public class HbmStore implements Store, AutoCloseable {
     }
 
     @Override
-    public void setDone(int id) {
+    public void update(int id) {
         try (Session session = sf.openSession()) {
             session.beginTransaction();
             Item item = session.get(Item.class, id);
             item.setDone(true);
-            session.update(item);
             session.getTransaction().commit();
         } catch (Exception ex) {
             log.error("Exception in SqlStore:", ex);

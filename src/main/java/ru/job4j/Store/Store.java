@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface Store {
     void add(Item item);
-    void setDone(int id);
+    void update(int id);
     List<Item> getAll();
 }
