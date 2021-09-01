@@ -1,5 +1,6 @@
 package ru.job4j.Store;
 
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.hibernate.Session;
@@ -9,6 +10,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import ru.job4j.model.Item;
 import java.util.List;
+import java.util.function.Function;
 
 public class HbmStore implements Store, AutoCloseable {
     private final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
@@ -18,6 +20,22 @@ public class HbmStore implements Store, AutoCloseable {
     private final Logger log = LoggerFactory.getLogger(HbmStore.class);
 
     private HbmStore() {
+    }
+
+    private<T> T  tx(Function<Session, T> command) {
+        final Session session = sf.openSession();
+        final Transaction transaction = session.beginTransaction();
+        try {
+            T rsl = command.apply(session);
+            transaction.commit();
+            return rsl;
+        } catch (final Exception e) {
+            session.getTransaction().rollback();
+            log.error("Exception in store:", e);
+            throw e;
+        } finally {
+            session.close();
+        }
     }
 
     public static Store instOf() {
@@ -35,37 +53,20 @@ public class HbmStore implements Store, AutoCloseable {
 
     @Override
     public void add(Item item) {
-        try (Session session = sf.openSession()) {
-            session.beginTransaction();
-            session.save(item);
-            session.getTransaction().commit();
-        } catch (Exception ex) {
-            log.error("Exception in SqlStore:", ex);
-        }
+        this.tx(session -> session.save(item));
     }
 
     @Override
     public void update(int id) {
-        try (Session session = sf.openSession()) {
-            session.beginTransaction();
+        this.tx(session -> {
             Item item = session.get(Item.class, id);
             item.setDone(true);
-            session.getTransaction().commit();
-        } catch (Exception ex) {
-            log.error("Exception in SqlStore:", ex);
-        }
+            return null;
+        });
     }
 
     @Override
     public List<Item> getAll() {
-        try (Session session = sf.openSession()) {
-            session.beginTransaction();
-            List<Item> items = session.createQuery("from Item order by done").list();
-            session.getTransaction().commit();
-            return items;
-        } catch (Exception ex) {
-            log.error("Exception in SqlStore:", ex);
-        }
-        return null;
+        return this.tx(session -> session.createQuery("from Item order by done").list());
     }
 }
