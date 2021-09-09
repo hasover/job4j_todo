@@ -9,6 +9,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import ru.job4j.model.Item;
+import ru.job4j.model.User;
 import java.util.List;
 import java.util.function.Function;
 
@@ -66,7 +67,19 @@ public class HbmStore implements Store, AutoCloseable {
     }
 
     @Override
-    public List<Item> getAll() {
-        return this.tx(session -> session.createQuery("from Item order by done").list());
+    public void add(User user) {
+        this.tx(session -> session.save(user));
+    }
+
+    @Override
+    public User findUserByLogin(String login) {
+        return (User) tx(session -> session.createQuery("from User where login =: param")
+        .setParameter("param", login).uniqueResult());
+    }
+
+    @Override
+    public List<Item> getAll(User user) {
+        return this.tx(session -> session.createQuery("from Item where user =: param order by done")
+                .setParameter("param", user).list());
     }
 }

@@ -1,5 +1,7 @@
 package ru.job4j.model;
 
+import com.google.gson.annotations.Expose;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -9,19 +11,25 @@ import java.util.Objects;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Expose
     private int id;
+    @Expose
     private String description;
+    @Expose
     private Timestamp created;
+    @Expose
     private boolean done;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @Expose
+    private User user;
 
-    public Item(int id, String description, Timestamp created, boolean done) {
-        this.id = id;
+    public Item(String description, User user) {
         this.description = description;
-        this.created = created;
-        this.done = done;
+        this.created = new Timestamp(System.currentTimeMillis());
+        this.user = user;
     }
     public Item() {
-
     }
 
     public int getId() {
@@ -54,6 +62,14 @@ public class Item {
 
     public void setDone(boolean done) {
         this.done = done;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
