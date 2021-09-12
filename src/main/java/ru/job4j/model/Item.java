@@ -4,6 +4,8 @@ import com.google.gson.annotations.Expose;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -24,12 +26,28 @@ public class Item {
     @Expose
     private User user;
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @Expose
+    private List<Category> categories = new ArrayList<>();
+
     public Item(String description, User user) {
         this.description = description;
         this.created = new Timestamp(System.currentTimeMillis());
         this.user = user;
     }
     public Item() {
+    }
+
+    public void addCategory(Category category) {
+        categories.add(category);
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
     }
 
     public int getId() {
@@ -92,6 +110,8 @@ public class Item {
                 ", description='" + description + '\'' +
                 ", created=" + created +
                 ", done=" + done +
+                ", user=" + user +
+                ", categories=" + categories +
                 '}';
     }
 }

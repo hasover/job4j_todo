@@ -16,85 +16,7 @@
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-<script>
-    let itemsList = null
-    $(document).ready(() => {
-        loadData();
-
-        document.getElementById('checkBox').addEventListener('change', function () {
-            if (this.checked) {
-                fillTable(true)
-            } else {
-                fillTable(false)
-            }
-        })
-    })
-
-    function loadData() {
-        $.ajax({
-            type: 'GET',
-            url: 'item.do',
-            dataType: 'json'
-        }).done(function (data) {
-            itemsList = data
-            fillTable(document.getElementById('checkBox').checked)
-        })
-    }
-
-    function fillTable(includeDone) {
-        let output = ''
-        let iconDone = '<i class="fa fa-check"></i>';
-        let iconNotDone = '<i class="fa fa-close"></i>';
-        let i = 0;
-        for (; i < itemsList.length; i++) {
-            if (itemsList[i].done === true) {
-                break;
-            }
-            output +=
-                '<tr>' +
-                '<th>' + iconNotDone + '</th>' +
-                '<th>' + itemsList[i].user.name + '</th>' +
-                '<th>' +
-                `<a href = "update.do?id=${itemsList[i].id}">` +
-                '<i class="fa fa-window-close" style="color: red"></i>' +
-                '</a>' +
-                itemsList[i].description + '</th>' +
-                '<th>' + itemsList[i].created + '</th>' +
-                '</tr>';
-        }
-        if (includeDone === true) {
-            for (; i < itemsList.length; i++) {
-                output +=
-                    '<tr>' +
-                    '<th>' + iconDone + '</th>' +
-                    '<th>' + itemsList[i].user.name + '</th>' +
-                    '<th>' + itemsList[i].description + '</th>' +
-                    '<th>' + itemsList[i].created + '</th>' +
-                    '</tr>';
-            }
-        }
-        document.getElementById('bodyTable').innerHTML = output;
-    }
-
-    function addNewItem() {
-        let description = document.getElementById('description').value
-        if (description === '') {
-            alert('Нужно заполнить описание')
-            return false
-        } else {
-            $.ajax({
-                type: 'POST',
-                url: 'item.do',
-                data: {'description': description},
-                dataType: 'text'
-            }).done(function (data) {
-                alert(data)
-                loadData()
-            })
-            return true
-        }
-    }
-
+<script src="script/index.js">
 </script>
 <body>
 <div class="container pt-3">
@@ -108,6 +30,11 @@
                 <div class="form-group">
                     <label for="description">Описание</label>
                     <textarea class="form-control" id="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category">Категории</label>
+                    <select class="form-control" name="category" id="category" multiple>
+                    </select>
                 </div>
                 <button type="button" class="btn btn-primary" onclick="addNewItem()">Добавить</button>
             </form>
@@ -130,7 +57,8 @@
         <tr>
             <th style="width: 5%;">Статус</th>
             <th style="width: 15%">Автор</th>
-            <th style="width: 60%;">Описание</th>
+            <th style="width: 45%;">Описание</th>
+            <th style="width: 15%">Категория</th>
             <th style="width: 20%;">Дата создания</th>
         </tr>
         </thead>

@@ -10,3 +10,8 @@ create table users (
     login varchar(20) unique ,
     password varchar(30)
 );
+create table categories(
+    id serial primary key ,
+    name varchar(100)
+);
+insert into categories(name) values ('личные'), ('семья'), ('друзья'), ('работа'), ('срочные');

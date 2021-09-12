@@ -11,7 +11,7 @@ import java.util.Set;
 public class AuthFilter implements Filter {
 
     private static final Set<String> ALLOWED_PATHS = Set.of(
-            "auth.html", "reg.html", "auth.do", "reg.do");
+            "auth.html", "reg.html", "auth.do", "reg.do", "auth.js", "reg.js");
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;

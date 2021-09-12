@@ -17,30 +17,9 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
             integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
             crossorigin="anonymous"></script>
-
     <title>Авторизация</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script>
-        function sendFormData() {
-            let login = document.getElementById('login').value;
-            let password = document.getElementById('password').value;
-            if (!(login && password)) {
-                alert('Нужно заполнить все поля.')
-                return ;
-            }
-            $.ajax({
-                type: 'POST',
-                url: 'auth.do',
-                data: {'login': login, 'password': password },
-                dataType : 'text'
-            }).done(function () {
-                window.location.href = "."
-            }).fail(function (jqXHR) {
-               alert(jqXHR.responseText)
-                document.getElementsByTagName('form')[0].reset();
-            });
-        }
-    </script>
+    <script src="script/auth.js"></script>
 </head>
 <body>
 <div class="container pt-3">

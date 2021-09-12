@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.util.List;
 
 @WebServlet(value = "/item.do")
@@ -38,8 +37,11 @@ public class IndexServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String description = req.getParameter("description");
+        String[] ids = req.getParameterValues("ids[]");
+        User user = (User) req.getSession().getAttribute("user");
+        Item item = new Item(description, user);
        Store store = HbmStore.instOf();
-       store.add(new Item(description, (User) req.getSession().getAttribute("user")));
+       store.add(item, ids);
        resp.setContentType("text/plain; charset=utf-8");
        try(OutputStream out = resp.getOutputStream()) {
            out.write("Описание добавлено.".getBytes(StandardCharsets.UTF_8));
